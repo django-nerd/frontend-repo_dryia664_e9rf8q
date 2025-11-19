@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
@@ -13,6 +14,21 @@ const priorityOptions = [
   { value: 'medium', label: 'Mittel' },
   { value: 'high', label: 'Hoch' },
 ]
+
+function Banner({ type = 'info', message, onClose }) {
+  if (!message) return null
+  const colors = {
+    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    error: 'bg-rose-50 text-rose-700 border-rose-200',
+    info: 'bg-sky-50 text-sky-700 border-sky-200',
+  }
+  return (
+    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className={`mb-4 border ${colors[type]} rounded-xl px-4 py-3 flex items-start justify-between`}>
+      <div>{message}</div>
+      <button onClick={onClose} className="ml-4 text-sky-700 hover:underline">Schließen</button>
+    </motion.div>
+  )
+}
 
 function TicketForm({ initial, onCancel, onSaved }) {
   const [title, setTitle] = useState(initial?.title || '')
@@ -46,36 +62,48 @@ function TicketForm({ initial, onCancel, onSaved }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm text-blue-200 mb-1">Titel</label>
-        <input value={title} onChange={(e)=>setTitle(e.target.value)} required className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30 text-white" placeholder="Kurzer Titel"/>
+        <label className="block text-sm text-slate-600 mb-1">Titel</label>
+        <input value={title} onChange={(e)=>setTitle(e.target.value)} required className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:ring-2 focus:ring-sky-300 focus:border-sky-300 transition" placeholder="Kurzer Titel"/>
       </div>
       <div>
-        <label className="block text-sm text-blue-200 mb-1">Beschreibung</label>
-        <textarea value={description} onChange={(e)=>setDescription(e.target.value)} rows={4} className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30 text-white" placeholder="Beschreibung (optional)"/>
+        <label className="block text-sm text-slate-600 mb-1">Beschreibung</label>
+        <textarea value={description} onChange={(e)=>setDescription(e.target.value)} rows={4} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:ring-2 focus:ring-sky-300 focus:border-sky-300 transition" placeholder="Beschreibung (optional)"/>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label className="block text-sm text-blue-200 mb-1">Status</label>
-          <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30 text-white">
+          <label className="block text-sm text-slate-600 mb-1">Status</label>
+          <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:ring-2 focus:ring-sky-300 focus:border-sky-300 transition">
             {statusOptions.map(o=> <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm text-blue-200 mb-1">Priorität</label>
-          <select value={priority} onChange={(e)=>setPriority(e.target.value)} className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30 text-white">
+          <label className="block text-sm text-slate-600 mb-1">Priorität</label>
+          <select value={priority} onChange={(e)=>setPriority(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:ring-2 focus:ring-sky-300 focus:border-sky-300 transition">
             {priorityOptions.map(o=> <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm text-blue-200 mb-1">Zuständig</label>
-          <input value={assignee} onChange={(e)=>setAssignee(e.target.value)} className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30 text-white" placeholder="Name/ID (optional)"/>
+          <label className="block text-sm text-slate-600 mb-1">Zuständig</label>
+          <input value={assignee} onChange={(e)=>setAssignee(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:ring-2 focus:ring-sky-300 focus:border-sky-300 transition" placeholder="Name/ID (optional)"/>
         </div>
       </div>
       <div className="flex gap-3">
-        <button disabled={submitting} className={`px-4 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white ${submitting?'opacity-70 cursor-not-allowed':''}`}>{isEdit? 'Speichern' : 'Erstellen'}</button>
-        <button type="button" onClick={onCancel} className="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600 text-white">Abbrechen</button>
+        <button disabled={submitting} className={`px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition ${submitting?'opacity-70 cursor-not-allowed':''}`}>{isEdit? 'Speichern' : 'Erstellen'}</button>
+        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">Abbrechen</button>
       </div>
     </form>
+  )
+}
+
+function RowSkeleton() {
+  return (
+    <div className="px-5 py-4 grid grid-cols-12 gap-4 animate-pulse">
+      <div className="col-span-4 h-4 bg-slate-200 rounded" />
+      <div className="col-span-2 h-4 bg-slate-200 rounded" />
+      <div className="col-span-2 h-4 bg-slate-200 rounded" />
+      <div className="col-span-2 h-4 bg-slate-200 rounded" />
+      <div className="col-span-2 h-8 bg-slate-200 rounded" />
+    </div>
   )
 }
 
@@ -83,6 +111,7 @@ export default function TicketsPage() {
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [banner, setBanner] = useState({ type: 'info', message: '' })
   const [showCreate, setShowCreate] = useState(false)
   const [editTicket, setEditTicket] = useState(null)
   const [filters, setFilters] = useState({ status: '', priority: '' })
@@ -122,63 +151,70 @@ export default function TicketsPage() {
       const res = await fetch(`${API_BASE}/api/tickets/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Löschen fehlgeschlagen')
       setTickets(prev => prev.filter(t => t.id !== id))
+      setBanner({ type: 'success', message: 'Ticket wurde gelöscht.' })
     } catch (e) {
-      alert(e.message)
+      setBanner({ type: 'error', message: e.message })
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-50 text-slate-900">
       <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Tickets</h1>
-            <p className="text-blue-200/80">Erstellen, ansehen, bearbeiten und löschen</p>
+            <h1 className="text-3xl font-bold tracking-tight">Tickets</h1>
+            <p className="text-slate-600">Erstellen, ansehen, bearbeiten und löschen</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={()=>{ setEditTicket(null); setShowCreate(true) }} className="px-4 py-2 rounded bg-blue-500 hover:bg-blue-600">Neues Ticket</button>
-            <a href="/" className="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600">Zur Startseite</a>
+            <button onClick={()=>{ setEditTicket(null); setShowCreate(true) }} className="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition">Neues Ticket</button>
+            <a href="/" className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">Zur Startseite</a>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-blue-500/20 rounded-2xl p-5 mb-8">
+        <AnimatePresence>{banner.message && (
+          <Banner type={banner.type} message={banner.message} onClose={()=>setBanner({ type: 'info', message: '' })} />
+        )}</AnimatePresence>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-8 shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm text-blue-200 mb-1">Status</label>
-              <select value={filters.status} onChange={(e)=>setFilters(f=>({...f,status:e.target.value}))} className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30">
+              <label className="block text-sm text-slate-600 mb-1">Status</label>
+              <select value={filters.status} onChange={(e)=>setFilters(f=>({...f,status:e.target.value}))} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 focus:ring-2 focus:ring-sky-300">
                 <option value="">Alle</option>
                 {statusOptions.map(o=> <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-blue-200 mb-1">Priorität</label>
-              <select value={filters.priority} onChange={(e)=>setFilters(f=>({...f,priority:e.target.value}))} className="w-full px-3 py-2 rounded bg-slate-900/60 border border-blue-500/30">
+              <label className="block text-sm text-slate-600 mb-1">Priorität</label>
+              <select value={filters.priority} onChange={(e)=>setFilters(f=>({...f,priority:e.target.value}))} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 focus:ring-2 focus:ring-sky-300">
                 <option value="">Alle</option>
                 {priorityOptions.map(o=> <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div className="flex items-end">
-              <button onClick={loadTickets} className="w-full px-3 py-2 rounded bg-slate-700 hover:bg-slate-600">Aktualisieren</button>
+              <button onClick={loadTickets} className="w-full px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">Aktualisieren</button>
             </div>
           </div>
         </div>
 
-        {showCreate && (
-          <div className="bg-slate-800/50 border border-blue-500/20 rounded-2xl p-6 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{editTicket ? 'Ticket bearbeiten' : 'Neues Ticket'}</h2>
-              <button onClick={()=>{ setShowCreate(false); setEditTicket(null) }} className="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Schließen</button>
-            </div>
-            <TicketForm
-              initial={editTicket}
-              onCancel={()=>{ setShowCreate(false); setEditTicket(null) }}
-              onSaved={(saved)=>{ setShowCreate(false); setEditTicket(null); loadTickets(); }}
-            />
-          </div>
-        )}
+        <AnimatePresence>
+          {showCreate && (
+            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">{editTicket ? 'Ticket bearbeiten' : 'Neues Ticket'}</h2>
+                <button onClick={()=>{ setShowCreate(false); setEditTicket(null) }} className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">Schließen</button>
+              </div>
+              <TicketForm
+                initial={editTicket}
+                onCancel={()=>{ setShowCreate(false); setEditTicket(null) }}
+                onSaved={(saved)=>{ setShowCreate(false); setEditTicket(null); setBanner({ type: 'success', message: editTicket ? 'Änderungen gespeichert.' : 'Ticket erstellt.' }); loadTickets(); }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <div className="bg-slate-800/50 border border-blue-500/20 rounded-2xl overflow-hidden">
-          <div className="grid grid-cols-12 gap-0 px-5 py-3 text-blue-200/80 border-b border-blue-500/20 text-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="grid grid-cols-12 gap-0 px-5 py-3 text-slate-600 border-b border-slate-200 text-sm bg-slate-50">
             <div className="col-span-4">Titel</div>
             <div className="col-span-2">Status</div>
             <div className="col-span-2">Priorität</div>
@@ -186,32 +222,36 @@ export default function TicketsPage() {
             <div className="col-span-2 text-right">Aktionen</div>
           </div>
           {loading ? (
-            <div className="p-6 text-blue-200/80">Laden...</div>
+            <div>
+              {Array.from({ length: 5 }).map((_, i) => <RowSkeleton key={i} />)}
+            </div>
           ) : error ? (
-            <div className="p-6 text-red-400">{error}</div>
+            <div className="p-6 text-rose-600">{error}</div>
           ) : filteredTickets.length === 0 ? (
-            <div className="p-6 text-blue-200/80">Keine Tickets vorhanden.</div>
+            <div className="p-6 text-slate-600">Keine Tickets vorhanden.</div>
           ) : (
-            <ul className="divide-y divide-blue-500/10">
-              {filteredTickets.map(t => (
-                <li key={t.id} className="px-5 py-4 grid grid-cols-12 gap-0 items-start">
-                  <div className="col-span-4">
-                    <div className="font-medium">{t.title}</div>
-                    {t.description && <div className="text-sm text-blue-200/70 line-clamp-2">{t.description}</div>}
-                  </div>
-                  <div className="col-span-2">
-                    <span className="px-2 py-1 rounded text-xs bg-slate-700">{t.status}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="px-2 py-1 rounded text-xs bg-slate-700">{t.priority}</span>
-                  </div>
-                  <div className="col-span-2 text-blue-200/80">{t.assignee || '-'}</div>
-                  <div className="col-span-2 flex justify-end gap-2">
-                    <button onClick={()=>{ setEditTicket(t); setShowCreate(true) }} className="px-3 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white text-sm">Bearbeiten</button>
-                    <button onClick={()=>handleDelete(t.id)} className="px-3 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-sm">Löschen</button>
-                  </div>
-                </li>
-              ))}
+            <ul className="divide-y divide-slate-200">
+              <AnimatePresence>
+                {filteredTickets.map(t => (
+                  <motion.li key={t.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="px-5 py-4 grid grid-cols-12 gap-0 items-start hover:bg-slate-50/80">
+                    <div className="col-span-4">
+                      <div className="font-medium text-slate-900">{t.title}</div>
+                      {t.description && <div className="text-sm text-slate-600 line-clamp-2">{t.description}</div>}
+                    </div>
+                    <div className="col-span-2">
+                      <span className="px-2 py-1 rounded text-xs bg-slate-100 text-slate-700 border border-slate-200">{t.status}</span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="px-2 py-1 rounded text-xs bg-slate-100 text-slate-700 border border-slate-200">{t.priority}</span>
+                    </div>
+                    <div className="col-span-2 text-slate-700">{t.assignee || '-'}</div>
+                    <div className="col-span-2 flex justify-end gap-2">
+                      <button onClick={()=>{ setEditTicket(t); setShowCreate(true) }} className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm shadow-sm transition">Bearbeiten</button>
+                      <button onClick={()=>handleDelete(t.id)} className="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm shadow-sm transition">Löschen</button>
+                    </div>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
             </ul>
           )}
         </div>
