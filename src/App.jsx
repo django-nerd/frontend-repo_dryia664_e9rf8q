@@ -59,8 +59,9 @@ function App() {
             </div>
           </div>
 
-          <div className="text-center">
-            <a href="/test" className="text-sm text-blue-300 hover:text-blue-200 underline">Backend/DB-Test öffnen</a>
+          <div className="text-center space-x-3">
+            <a href="/tickets" className="inline-block px-5 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors">Tickets öffnen</a>
+            <a href="/test" className="inline-block px-5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-colors">Backend/DB-Test</a>
           </div>
         </div>
       </div>
